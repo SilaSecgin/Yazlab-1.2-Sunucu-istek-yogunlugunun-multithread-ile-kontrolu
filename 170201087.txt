@@ -1,0 +1,443 @@
+////// Controller.java /////
+
+package MultiThread;
+
+import java.util.Random;
+
+
+public class Controller {
+	public static Thread mainThread;
+	public static Thread sub1Thread;
+	public static Thread sub2Thread;
+	public static int mainCapacity =0;
+	public static int sub1Capacity =0;
+	public static int sub2Capacity =0;
+	public static Thread threadN[] = new Thread [100];
+	public static int subNCapacity[] = new int[100];
+	public static int counter =0;
+	public static ControllerFrame controlFrame = new ControllerFrame();
+	
+	public static int get50 () {
+		Random rnd = new Random();
+		return rnd.nextInt(50);
+	}
+	public static int get100 () {
+		Random rnd2 = new Random();
+		return rnd2.nextInt(100);
+	}
+	public static int get300 () {
+		Random rnd2 = new Random();
+		return rnd2.nextInt(300);
+	}
+	public static int get500 () {
+		Random rnd2 = new Random();
+		return rnd2.nextInt(500);
+	}
+	public static void mainCapacityControl(int mainCap) {
+		if(mainCap > 10000) {
+			System.out.println("MainThread Capacity is Full ! ");
+		}
+		else {
+			System.out.println("Main --> "+mainCap);
+			controlFrame.jl_main_percent.setText("%"+String.valueOf(mainCalculate(mainCap)));
+			controlFrame.progressBar.setValue(mainCalculate(mainCap));
+		}
+	}
+	public static void sub1CapacityControl(int subCap) {
+		if(childCalculate(subCap)>= 70) {
+			subNCapacity[counter]= sub1ThreadDivide(subCap);
+			controlFrame.progresBarCreate();
+			subNCreate();
+			
+			
+		}
+		else {
+			System.out.println("Child 1 -- > "+subCap);
+			controlFrame.jl_child_percent.setText("%"+String.valueOf(childCalculate(subCap)));
+			controlFrame.progressBar2.setValue(childCalculate(subCap));
+		}
+	}
+	public static void sub2CapacityControl(int subCap2) {
+		if(childCalculate(subCap2)>= 70) {
+			subNCapacity[counter]= sub2ThreadDivide(subCap2);
+			controlFrame.progresBarCreate();
+			subNCreate();
+		}
+		else {
+			System.out.println("Child 2 -- > "+subCap2);
+			controlFrame.jl_child_percent2.setText("%"+String.valueOf(childCalculate(subCap2)));
+			controlFrame.progressBar3.setValue(childCalculate(subCap2));
+		}
+	}
+	public static int mainCalculate(int value) {
+		int mainPercent = value*100/10000;
+		return mainPercent;
+	} 
+	public static int childCalculate(int value) {
+		int threadPercent = value*100/5000;
+		return threadPercent;
+	}
+	private static int sub1ThreadDivide(int sub1) {
+		sub1 = sub1/2;
+		sub1Capacity = sub1;
+		return sub1;
+	}
+	private static int sub2ThreadDivide(int sub2) {
+		sub2 = sub2/2;
+		sub2Capacity = sub2; 
+		return sub2;
+	}
+	private static void subNCreate () {
+		threadN[counter] =new Thread (new SubNThread()); 
+		threadN[counter].start();
+		counter++;
+	}
+	public static void subNCapacityControl(int subCapN, int n) {
+		if(childCalculate(subCapN)>= 70) {
+			subNCapacity[n]= sub2ThreadDivide(subCapN);
+			controlFrame.progresBarCreate();
+			subNCreate();
+		}
+		else {
+			System.out.println("Child N "+counter +" -- > "+subCapN);
+			controlFrame.jLabel2[n].setText("%"+String.valueOf(childCalculate(subCapN)));
+			controlFrame.progressBarr[n].setValue(childCalculate(subCapN));
+		}
+	}
+}
+
+
+/// ControllerFrame.java ////
+
+package MultiThread;
+
+import java.awt.Color;
+
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+
+
+public class ControllerFrame {
+	static int deneme=180,deneme2=150;
+	public static JLabel jl_main, jl_main_percent, jl_child, jl_child_percent;
+	public static JLabel jLabel[] = new JLabel[10];
+	public static JLabel jLabel2[] = new JLabel[10];
+    public static JLabel jl_child2, jl_child_percent2;
+    public static JProgressBar progressBar,progressBar2,progressBar3;
+    public static JProgressBar progressBarr[] = new JProgressBar[10];;
+    public static MainFrame main = new MainFrame();
+    public static Controller control = new Controller();
+    
+	public static void start() {
+		
+		jl_main = new JLabel("Main Thread");
+	    jl_main.setForeground(Color.black);
+	    jl_main.setBounds(65, 150, 125, 25);
+	    
+	    jl_main_percent = new JLabel("%0");
+	    jl_main_percent.setForeground(Color.black);
+	    jl_main_percent.setBounds(220, 180, 125, 25);
+	        
+	    progressBar = new JProgressBar();
+		progressBar.setBounds(65, 180, 125, 25);
+		progressBar.setValue(0);
+		
+		jl_child = new JLabel("Child Thread");
+		jl_child.setForeground(Color.black);
+		jl_child.setBounds(65, 210, 125, 25);
+	    
+		jl_child_percent = new JLabel("%0");
+		jl_child_percent.setForeground(Color.black);
+		jl_child_percent.setBounds(220, 240, 125, 25);
+	        
+	    progressBar2 = new JProgressBar();
+		progressBar2.setBounds(65, 240, 125, 25);
+		progressBar2.setValue(0);
+		
+		jl_child2 = new JLabel("Child Thread2");
+		jl_child2.setForeground(Color.black);
+		jl_child2.setBounds(65, 270, 125, 25);
+	    
+		jl_child_percent2 = new JLabel("%0");
+		jl_child_percent2.setForeground(Color.black);
+		jl_child_percent2.setBounds(220, 300, 125, 25);
+	        
+	    progressBar3 = new JProgressBar();
+		progressBar3.setBounds(65, 300, 125, 25);
+		progressBar3.setValue(0);
+		
+		main.panel.add(jl_main);
+		main.panel.add(jl_main_percent);
+		main.panel.add(progressBar);
+	    
+		main.panel.add(jl_child);
+		main.panel.add(jl_child_percent);
+		main.panel.add(progressBar2);
+	    
+		main.panel.add(jl_child2);
+		main.panel.add(jl_child_percent2);
+		main.panel.add(progressBar3);
+	}
+	
+    public static void progresBarCreate() {
+		
+		jLabel[control.counter] = new JLabel("Child Thread "+(3+control.counter));
+		jLabel[control.counter].setForeground(Color.black);
+		jLabel[control.counter].setBounds(300, deneme2, 125, 25);
+		
+		jLabel2[control.counter] = new JLabel();
+		jLabel2[control.counter].setForeground(Color.black);
+		jLabel2[control.counter].setBounds(440, deneme, 125, 25);
+		
+		progressBarr[control.counter] = new JProgressBar();
+		progressBarr[control.counter].setBounds(300, deneme, 125, 25);
+		
+		main.panel.add(progressBarr[control.counter]);
+		main.panel.add(jLabel[control.counter]);
+		main.panel.add(jLabel2[control.counter]);
+		main.panel.repaint();
+		
+		deneme=deneme+60;
+		deneme2 = deneme2+60;
+	}
+}
+ /// MainFrame.java ///
+
+package MultiThread;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class MainFrame {
+	
+    public static JPanel panel;
+    public static JFrame frame; 
+    
+  
+public static void main(String[] args) {
+	// TODO Auto-generated method stub
+	frame = new JFrame("Giris Ekrani");
+	frame.setBounds(50, 50, 1300, 700);
+	frame.setLocation(10, 10);
+	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	panel = new JPanel();
+	panel.setLayout(null);
+	frame.setContentPane(panel);
+	frame.setResizable(false);
+	frame.setVisible(true);
+       
+    ControllerFrame controlFrame = new ControllerFrame();
+    controlFrame.start();
+    
+    Controller control = new Controller();
+	
+	control.mainThread = new Thread(new MainThread());
+	control.mainThread.start();
+	control.mainThread.setPriority(10);
+ 	
+	control.sub1Thread = new Thread(new Sub1Thread());
+	control.sub1Thread.start();
+	control.sub1Thread.setPriority(10);
+ 	
+	control.sub2Thread = new Thread(new Sub2Thread());
+	control.sub2Thread.start();
+	control.sub2Thread.setPriority(10);
+    
+    
+}
+}
+
+/// MainThread.java ///
+
+package MultiThread;
+
+public class MainThread implements Runnable {
+	Controller control = new Controller();
+	int istekKabul = 0;
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+		for(int i=0; i<10000; i++) {
+			
+			istekKabul = control.get100();
+			
+			/// MAİNTHREAD HER 200 MİLİSANİYE DE BİR İSTEĞE GERİ DÖNÜŞ YAPIYOR
+			try {
+				control.mainThread.yield();
+				control.mainThread.sleep(200);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			int istekDonus = control.get50();
+			
+			control.mainCapacity = (istekKabul-istekDonus)+control.mainCapacity;
+			if(control.mainCapacity <0){ control.mainCapacity =0;}
+			control.mainCapacityControl(control.mainCapacity);
+			i = control.mainCapacity;
+			
+			/// MAİNTHREAD HER 500 MİLİSANİYE DE BİR İSTEK KABUL EDİYOR
+			try {
+				control.mainThread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+
+}
+
+/// Sub1Thread.java ///
+
+package MultiThread;
+
+
+public class Sub1Thread implements Runnable {
+	Controller control = new Controller();
+	int istekKabul = 0;
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		for(int i=0; i<5000; i++) {
+			
+			istekKabul = control.get50();
+			control.mainCapacity = control.mainCapacity-istekKabul;
+			if(control.mainCapacity < 0 ) control.mainCapacity =0;
+			//control.mainCapacityControl(control.mainCapacity);
+			
+			/// SUB1 HER 300 MİLİSANİYE DE BİR İSTEĞE GERİ DÖNÜŞ YAPIYOR
+			try {
+				control.sub1Thread.yield();
+				control.sub1Thread.sleep(300);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			int istekDonus=control.get50();
+			int tut = istekKabul-istekDonus;
+
+			control.sub1Capacity = tut+control.sub1Capacity;
+			if(control.sub1Capacity < 0) control.sub1Capacity=0;
+			control.sub1CapacityControl(control.sub1Capacity);
+				
+				i=control.sub1Capacity;
+			
+			/// SUB1 HER 500 MİLİSANİYE DE BİR İSTEK KABUL EDİYOR
+			try {
+				control.sub1Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+}
+
+/// Sub2Thread.java ///
+package MultiThread;
+
+public class Sub2Thread implements Runnable {
+	Controller control = new Controller();
+	int tut =0;
+	int istekKabul=0;
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		for(int i=0; i<5000; i++) {
+			
+			istekKabul = control.get50();
+			control.mainCapacity = control.mainCapacity - istekKabul;
+			if(control.mainCapacity < 0) control.mainCapacity=0;
+			//control.mainCapacityControl(control.mainCapacity);
+			
+			/// SUB1 HER 300 MİLİSANİYE DE BİR İSTEĞE GERİ DÖNÜŞ YAPIYOR
+			try {
+				control.sub2Thread.yield();
+				control.sub2Thread.sleep(300);
+				
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			int istekDonus=control.get50();
+			int tut = istekKabul-istekDonus;
+			
+			control.sub2Capacity = tut+control.sub2Capacity;
+			if(control.sub2Capacity <0 )control.sub2Capacity =0;
+			control.sub2CapacityControl(control.sub2Capacity);
+			i = control.sub2Capacity;
+			
+			/// SUB1 HER 500 MİLİSANİYE DE BİR İSTEK KABUL EDİYOR
+			try {
+				control.sub2Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+			
+	}
+
+}
+
+/// SubNThread.java ///
+
+package MultiThread;
+
+
+public class SubNThread implements Runnable {
+	Controller control = new Controller();
+	ControllerFrame controlFrame = new ControllerFrame();
+	int istekKabul = 0;
+	int tut = 0;
+	int n = control.counter;
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+		for (int i = control.subNCapacity[n]; i<5000;i++) {
+			istekKabul = control.get50();
+			control.subNCapacity[n]=control.subNCapacity[n]-istekKabul;
+			if(control.subNCapacity[n]<0) { 
+				control.threadN[n].stop();
+			}
+			//control.subNCapacityControl(control.subNCapacity[n], n);
+			
+			/// SUB1 HER 300 MİLİSANİYE DE BİR İSTEĞE GERİ DÖNÜŞ YAPIYOR
+			try {
+				control.threadN[n].yield();
+				control.threadN[n].sleep(300);
+				
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			int istekDonus=control.get50();
+			int tut = istekKabul-istekDonus;
+			
+			control.subNCapacity[n] = tut+control.subNCapacity[n];
+			if(control.subNCapacity[n] <0 ) {
+				control.subNCapacity[n] =0;
+				controlFrame.jLabel[n].setVisible(false);
+				controlFrame.jLabel2[n].setVisible(false);
+				controlFrame.progressBarr[n].setVisible(false);
+				control.threadN[n].stop();
+			}
+			control.subNCapacityControl(control.subNCapacity[n], n);
+			
+			i = control.subNCapacity[n];
+		}
+	}
+	
+
+
+
+}
